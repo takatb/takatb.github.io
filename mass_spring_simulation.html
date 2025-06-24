@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จำลอง Mass-Spring System แนวตั้ง (แก้ไขสเกลกราฟ)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+    #controls { margin-bottom: 10px; text-align: center; }
+    .control-group { margin: 10px; display: inline-block; text-align: left; }
+    label { display: block; margin-bottom: 5px; }
+    input[type=range] { width: 200px; }
+    #info { margin-bottom: 20px; text-align: center; font-size: 16px; }
+    #container { display: flex; justify-content: center; align-items: flex-start; }
+    canvas { background: #f0f0f0; border: 1px solid #ccc; margin: 0 10px; }
+    button { margin-left: 10px; padding: 5px 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;">จำลอง Mass-Spring System </h1>
+  <div id="controls">
+    <div class="control-group">
+      <label>ค่าคงที่สปริง k (N/m): <span id="k-value">50.0</span></label>
+      <input type="range" id="k" min="1" max="200" step="1" value="50">
+    </div>
+    <div class="control-group">
+      <label>มวล m (kg): <span id="m-value">1.0</span></label>
+      <input type="range" id="m" min="0.1" max="5.0" step="0.1" value="1.0">
+    </div>
+    <div class="control-group">
+      <label>ตำแหน่งเริ่มต้น y₀ (m): <span id="y0-value">0.5</span></label>
+      <input type="range" id="y0" min="-1" max="1" step="0.1" value="0.5">
+    </div>
+    <button id="reset">เริ่มต้นใหม่</button>
+    <button id="pause">หยุด</button>
+  </div>
+  <div id="info">
+    คาบ (T): <span id="period">0.00</span> s, ความถี่ (f): <span id="freq">0.00</span> Hz
+  </div>
+  <div id="container">
+    <canvas id="canvasSim" width="500" height="500"></canvas>
+    <canvas id="canvasPlot" width="500" height="500"></canvas>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const simCanvas = document.getElementById('canvasSim');
+      const simCtx = simCanvas.getContext('2d');
+      const plotCanvas = document.getElementById('canvasPlot');
+      const plotCtx = plotCanvas.getContext('2d');
+      simCtx.font = '16px sans-serif';
+      plotCtx.font = '14px sans-serif';
+
+      const kControl = document.getElementById('k');
+      const mControl = document.getElementById('m');
+      const y0Control = document.getElementById('y0');
+      const resetBtn = document.getElementById('reset');
+      const pauseBtn = document.getElementById('pause');
+      const kVal = document.getElementById('k-value');
+      const mVal = document.getElementById('m-value');
+      const y0Val = document.getElementById('y0-value');
+      const periodSpan = document.getElementById('period');
+      const freqSpan = document.getElementById('freq');
+
+      let k, m, y, v, origin, equilibriumY, scale, timeStep, history, simTime;
+      let isPaused = false;
+
+      function initSimulation() {
+        scale = 200;       // px per meter
+        timeStep = 0.02;   // s
+        origin = { x: simCanvas.width / 2, y: 20 }; // จุดยึดสปริงบนสุด
+        equilibriumY = simCanvas.height / 2;       // ตำแหน่งมวลสมดุลกลางภาพ
+      }
+
+      function updateParameters() {
+        k = parseFloat(kControl.value);
+        m = parseFloat(mControl.value);
+        y = parseFloat(y0Control.value);
+        v = 0;
+        history = [];
+        simTime = 0;
+        kVal.textContent = k.toFixed(1);
+        mVal.textContent = m.toFixed(1);
+        y0Val.textContent = y.toFixed(1);
+        const period = 2 * Math.PI * Math.sqrt(m / k);
+        periodSpan.textContent = period.toFixed(2);
+        freqSpan.textContent = (1 / period).toFixed(2);
+      }
+
+      kControl.addEventListener('input', updateParameters);
+      mControl.addEventListener('input', updateParameters);
+      y0Control.addEventListener('input', updateParameters);
+      resetBtn.addEventListener('click', () => { updateParameters(); if (isPaused) togglePause(); });
+      pauseBtn.addEventListener('click', togglePause);
+
+      function togglePause() {
+        isPaused = !isPaused;
+        pauseBtn.textContent = isPaused ? 'เล่น' : 'หยุด';
+      }
+
+      function step() {
+        const a = - (k / m) * y;
+        v += a * timeStep;
+        y += v * timeStep;
+        simTime += timeStep;
+        history.push({ y, t: simTime });
+        while (history.length && history[0].t < simTime - 10) history.shift();
+      }
+
+      function drawSim() {
+        simCtx.clearRect(0, 0, simCanvas.width, simCanvas.height);
+        // เส้นประสีเทา โปรเจคมวล
+        const massY = equilibriumY + scale * y;
+        simCtx.save();
+        simCtx.setLineDash([5, 5]);
+        simCtx.beginPath();
+        simCtx.strokeStyle = '#888';
+        simCtx.moveTo(0, massY);
+        simCtx.lineTo(simCanvas.width, massY);
+        simCtx.stroke();
+        simCtx.restore();
+        // วาดสปริง zigzag
+        const top = origin;
+        const coils = 20;
+        const amp = 15;
+        simCtx.beginPath();
+        simCtx.moveTo(top.x, top.y);
+        for (let i = 1; i <= coils; i++) {
+          const frac = i / coils;
+          const px = top.x + (i % 2 ? -amp : amp);
+          const py = top.y + frac * (massY - top.y);
+          simCtx.lineTo(px, py);
+        }
+        simCtx.lineTo(top.x, massY);
+        simCtx.strokeStyle = '#000'; simCtx.lineWidth = 2; simCtx.stroke();
+        // วาดมวล
+        const box = 40;
+        simCtx.fillStyle = '#007acc';
+        simCtx.fillRect(top.x - box/2, massY, box, box);
+        simCtx.strokeStyle = '#003366';
+        simCtx.strokeRect(top.x - box/2, massY, box, box);
+        // ข้อมูลสถานะ
+        simCtx.fillStyle = '#000';
+        simCtx.fillText(`y = ${y.toFixed(2)} m`, 10, simCanvas.height - 40);
+        simCtx.fillText(`v = ${v.toFixed(2)} m/s`, 10, simCanvas.height - 20);
+      }
+
+      function drawPlot() {
+        const w = plotCanvas.width;
+        const h = plotCanvas.height;
+        const mgn = 40;
+        plotCtx.clearRect(0, 0, w, h);
+        // แกนกราฟ
+        plotCtx.beginPath();
+        plotCtx.moveTo(mgn, h - mgn); plotCtx.lineTo(w - mgn, h - mgn);
+        plotCtx.moveTo(mgn, mgn); plotCtx.lineTo(mgn, h - mgn);
+        plotCtx.strokeStyle = '#000'; plotCtx.lineWidth = 1; plotCtx.stroke();
+        if (history.length > 1) {
+          const t0 = history[0].t;
+          const t1 = history[history.length - 1].t;
+          const yMin = -1;
+          const yMax = 1;
+          // ticks แกน t
+          for (let i = 0; i <= 5; i++) {
+            const t = t0 + (t1 - t0) * (i / 5);
+            const xP = mgn + (w - 2 * mgn) * (i / 5);
+            plotCtx.beginPath(); plotCtx.moveTo(xP, h - mgn); plotCtx.lineTo(xP, h - mgn + 5); plotCtx.stroke();
+            plotCtx.fillText(t.toFixed(1), xP - 10, h - mgn + 20);
+          }
+          // ticks แกน y (fixed -1 ถึง 1)
+          for (let i = 0; i <= 5; i++) {
+            const yv = yMin + (yMax - yMin) * (i / 5);
+            const yP = mgn + (h - 2 * mgn) * ((yv - yMin) / (yMax - yMin));
+            plotCtx.beginPath(); plotCtx.moveTo(mgn - 5, yP); plotCtx.lineTo(mgn, yP); plotCtx.stroke();
+            plotCtx.fillText(yv.toFixed(2), 5, yP + 5);
+          }
+          // เส้นโค้ง y vs t
+          plotCtx.beginPath();
+          history.forEach((p, i) => {
+            const xP = mgn + ((p.t - t0) / (t1 - t0)) * (w - 2 * mgn);
+            const yP = mgn + ((p.y - yMin) / (yMax - yMin)) * (h - 2 * mgn);
+            i === 0 ? plotCtx.moveTo(xP, yP) : plotCtx.lineTo(xP, yP);
+          });
+          plotCtx.strokeStyle = '#007acc'; plotCtx.lineWidth = 2; plotCtx.stroke();
+        }
+        // ป้ายชื่อแกน
+        plotCtx.fillStyle = '#000';
+        plotCtx.fillText('t (s)', w / 2 - 20, h - 10);
+        plotCtx.fillText('y (m)', 5, mgn - 10);
+      }
+
+      function animate() { if (!isPaused) { step(); drawSim(); drawPlot(); } requestAnimationFrame(animate); }
+
+      initSimulation(); updateParameters(); animate();
+    });
+  </script>
+</body>
+</html>

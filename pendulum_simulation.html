@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จำลองการเคลื่อนที่ของ Pendulum</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+    #controls { margin-bottom: 10px; text-align: center; }
+    .control-group { margin: 10px; display: inline-block; text-align: left; }
+    label { display: block; margin-bottom: 5px; }
+    input[type=range] { width: 200px; }
+    #info { margin-bottom: 20px; text-align: center; font-size: 16px; }
+    #container { display: flex; justify-content: center; align-items: flex-start; }
+    canvas { background: #f0f0f0; border: 1px solid #ccc; margin: 0 10px; }
+    button { margin-left: 10px; padding: 5px 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;">จำลองการเคลื่อนที่ของ Pendulum</h1>
+  <div id="controls">
+    <div class="control-group">
+      <label>ความยาว L (m): <span id="L-value">1.0</span></label>
+      <input type="range" id="L" min="0.1" max="2.0" step="0.1" value="1.0">
+    </div>
+    <div class="control-group">
+      <label>มวล m (kg): <span id="m-value">1.0</span></label>
+      <input type="range" id="m" min="0.1" max="5.0" step="0.1" value="1.0">
+    </div>
+    <div class="control-group">
+      <label>มุมเริ่มต้น θ₀ (°): <span id="theta0-value">30</span></label>
+      <input type="range" id="theta0" min="1" max="89" step="1" value="30">
+    </div>
+    <button id="reset">เริ่มต้นใหม่</button>
+    <button id="pause">หยุด</button>
+  </div>
+  <div id="info">
+    คาบ (T): <span id="period">0.00</span> s, ความถี่ (f): <span id="freq">0.00</span> Hz
+  </div>
+  <div id="container">
+    <canvas id="canvasSim" width="500" height="500"></canvas>
+    <canvas id="canvasPlot" width="500" height="500"></canvas>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const simCanvas = document.getElementById('canvasSim');
+      const simCtx = simCanvas.getContext('2d');
+      const plotCanvas = document.getElementById('canvasPlot');
+      const plotCtx = plotCanvas.getContext('2d');
+      simCtx.font = '16px sans-serif';
+      plotCtx.font = '14px sans-serif';
+
+      const LControl = document.getElementById('L');
+      const mControl = document.getElementById('m');
+      const thetaControl = document.getElementById('theta0');
+      const resetBtn = document.getElementById('reset');
+      const pauseBtn = document.getElementById('pause');
+      const LVal = document.getElementById('L-value');
+      const mVal = document.getElementById('m-value');
+      const thetaVal = document.getElementById('theta0-value');
+      const periodSpan = document.getElementById('period');
+      const freqSpan = document.getElementById('freq');
+
+      let L, m, theta, omega, g, origin, scale, timeStep, history, simTime;
+      let isPaused = false;
+
+      function initSimulation() {
+        g = 9.81;
+        scale = 200;
+        timeStep = 0.02;
+        origin = { x: simCanvas.width / 2, y: 50 };
+      }
+
+      function updateParameters() {
+        L = parseFloat(LControl.value);
+        m = parseFloat(mControl.value);
+        theta = parseFloat(thetaControl.value) * Math.PI / 180;
+        omega = 0;
+        history = [];
+        simTime = 0;
+        LVal.textContent = L.toFixed(1);
+        mVal.textContent = m.toFixed(1);
+        thetaVal.textContent = thetaControl.value;
+        const period = 2 * Math.PI * Math.sqrt(L / g);
+        const frequency = 1 / period;
+        periodSpan.textContent = period.toFixed(2);
+        freqSpan.textContent = frequency.toFixed(2);
+      }
+
+      LControl.addEventListener('input', updateParameters);
+      mControl.addEventListener('input', updateParameters);
+      thetaControl.addEventListener('input', updateParameters);
+      resetBtn.addEventListener('click', () => {
+        updateParameters();
+        if (isPaused) togglePause();
+      });
+      pauseBtn.addEventListener('click', togglePause);
+
+      function togglePause() {
+        isPaused = !isPaused;
+        pauseBtn.textContent = isPaused ? 'เล่น' : 'หยุด';
+      }
+
+      function step() {
+        const alpha = - (g / L) * Math.sin(theta);
+        omega += alpha * timeStep;
+        theta += omega * timeStep;
+        simTime += timeStep;
+        const x = origin.x + scale * L * Math.sin(theta);
+        const y = origin.y + scale * L * Math.cos(theta);
+        history.push({ x, y, t: simTime, theta });
+        while (history.length && history[0].t < simTime - 10) history.shift();
+      }
+
+      function drawSim() {
+        simCtx.clearRect(0, 0, simCanvas.width, simCanvas.height);
+        if (history.length > 1) {
+          simCtx.save();
+          simCtx.setLineDash([5,5]);
+          simCtx.beginPath();
+          simCtx.moveTo(history[0].x, history[0].y);
+          history.slice(1).forEach(p => simCtx.lineTo(p.x, p.y));
+          simCtx.strokeStyle = '#555'; simCtx.lineWidth = 1;
+          simCtx.stroke();
+          simCtx.restore();
+        }
+        const x = origin.x + scale * L * Math.sin(theta);
+        const y = origin.y + scale * L * Math.cos(theta);
+        simCtx.beginPath();
+        simCtx.moveTo(origin.x, origin.y);
+        simCtx.lineTo(x, y);
+        simCtx.strokeStyle = '#000'; simCtx.lineWidth = 2; simCtx.stroke();
+        simCtx.beginPath();
+        simCtx.arc(x, y, m * 5, 0, 2 * Math.PI);
+        simCtx.fillStyle = '#007acc'; simCtx.fill();
+        simCtx.strokeStyle = '#003366'; simCtx.stroke();
+        simCtx.fillStyle = '#000';
+        simCtx.fillText(`θ = ${(theta*180/Math.PI).toFixed(1)}°`, 10, simCanvas.height - 40);
+        simCtx.fillText(`ω = ${omega.toFixed(2)} rad/s`, 10, simCanvas.height - 20);
+      }
+
+      function drawPlot() {
+        const w = plotCanvas.width;
+        const h = plotCanvas.height;
+        const margin = 40;
+        plotCtx.clearRect(0, 0, w, h);
+        plotCtx.beginPath();
+        plotCtx.moveTo(margin, h - margin); plotCtx.lineTo(w - margin, h - margin);
+        plotCtx.moveTo(margin, margin); plotCtx.lineTo(margin, h - margin);
+        plotCtx.strokeStyle = '#000'; plotCtx.lineWidth = 1; plotCtx.stroke();
+        if (history.length > 1) {
+          const tMin = history[0].t;
+          const tMax = history[history.length - 1].t;
+          let thetaMin = Math.min(...history.map(p => p.theta));
+          let thetaMax = Math.max(...history.map(p => p.theta));
+          if (thetaMin === thetaMax) { thetaMin -= 0.1; thetaMax += 0.1; }
+          const xTicks = 5;
+          for (let i = 0; i <= xTicks; i++) {
+            const t = tMin + (tMax - tMin) * (i / xTicks);
+            const xPos = margin + (w - 2*margin) * (i / xTicks);
+            plotCtx.beginPath();
+            plotCtx.moveTo(xPos, h - margin); plotCtx.lineTo(xPos, h - margin + 5); plotCtx.stroke();
+            plotCtx.fillText(t.toFixed(1), xPos - 10, h - margin + 20);
+          }
+          const yTicks = 5;
+          for (let i = 0; i <= yTicks; i++) {
+            const thetaValAxis = thetaMin + (thetaMax - thetaMin) * (i / yTicks);
+            const yPDot = h - (margin + (h - 2*margin) * (i / yTicks));
+            plotCtx.beginPath();
+            plotCtx.moveTo(margin - 5, yPDot); plotCtx.lineTo(margin, yPDot); plotCtx.stroke();
+            plotCtx.fillText(thetaValAxis.toFixed(2), 5, yPDot + 5);
+          }
+          plotCtx.beginPath();
+          history.forEach((p, i) => {
+            const xP = margin + ((p.t - tMin) / (tMax - tMin)) * (w - 2*margin);
+            const yP = h - (margin + ((p.theta - thetaMin) / (thetaMax - thetaMin)) * (h - 2*margin));
+            i===0? plotCtx.moveTo(xP, yP): plotCtx.lineTo(xP, yP);
+          });
+          plotCtx.strokeStyle = '#007acc'; plotCtx.lineWidth = 2; plotCtx.stroke();
+        }
+        plotCtx.fillStyle = '#000';
+        plotCtx.fillText('t (s)', w/2 - 20, h - 10);
+        plotCtx.fillText('θ (rad)', 5, margin - 10);
+      }
+
+      function animate() {
+        if (!isPaused) {
+          drawSim(); drawPlot(); step();
+        }
+        requestAnimationFrame(animate);
+      }
+
+      initSimulation(); updateParameters(); animate();
+    });
+  </script>
+</body>
+</html>
