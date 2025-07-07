@@ -1,0 +1,31 @@
+/* watermark.css */
+
+/* — คุณสามารถแก้สี ขนาด หมุน หรือข้อความได้ในส่วนนี้เลย — */
+:root {
+  /* ข้อความลายน้ำ (ถ้าจะเปลี่ยนข้อความ ให้แก้ที่นี่) */
+  --wm-text: "Takat B - Mechanical Engineering, RMUTR";
+  /* สีและความโปร่งใส */
+  --wm-color: rgba(0, 0, 0, 0.1);
+  /* ขนาดตัวอักษร */
+  --wm-size: 4rem;
+  /* การหมุน (deg) */
+  --wm-rotate: -45deg;
+}
+
+.watermark {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(var(--wm-rotate));
+  color: var(--wm-color);
+  font-size: var(--wm-size);
+  font-family: sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ใช้ pseudo-element เพื่อไม่ต้องซ้ำ <div> ถ้ามีหลายหน้าก็เรียกใช้ class เดียวกันได้เลย */
+.watermark::before {
+  content: var(--wm-text);
+}
