@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>QR Code Generator — สร้างคิวอาร์โค้ดแบบไฟล์เดียว</title>
+  <meta name="description" content="Single-file QR Code generator with size, margin, colors, error correction, and PNG/SVG download." />
+  <!-- QR library (auto-select versioned CDN). If you need offline use, save this file and keep the script tag as-is. -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #11172d;
+      --muted: #93a1b3;
+      --text: #e8edf7;
+      --accent: #3ea1ff;
+      --accent-2: #7bd389;
+      --danger: #ff6b6b;
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: radial-gradient(1200px 600px at 70% -20%, #1b2447 0%, var(--bg) 60%);
+      color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Inter, "Noto Sans Thai", sans-serif;
+      display: grid; place-items: start center;
+      padding: 24px;
+    }
+    .app { width: min(1080px, 100%); display: grid; gap: 16px; }
+    header { display: flex; align-items: center; gap: 12px; }
+    header .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 16px var(--accent); }
+    h1 { font-size: clamp(22px, 2.6vw, 30px); margin: 0; font-weight: 700; letter-spacing: .3px; }
+    .panels { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+    @media (max-width: 900px){ .panels { grid-template-columns: 1fr; } }
+    .card { background: color-mix(in srgb, var(--panel) 96%, #000 4%); border: 1px solid #2b3561;
+            border-radius: var(--radius); box-shadow: 0 10px 45px rgba(0,0,0,.35); }
+    .card .head { padding: 16px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom: 1px dashed #2b3561; }
+    .card .body { padding: 18px; }
+
+    label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+    textarea, input[type="text"], input[type="number"], select {
+      width: 100%; padding: 12px 12px; border-radius: 10px; border: 1px solid #3a4574; background: #0f1630; color: var(--text);
+      outline: none; transition: border-color .2s ease;
+    }
+    textarea:focus, input:focus, select:focus { border-color: var(--accent); }
+    textarea { min-height: 120px; resize: vertical; }
+
+    .row { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; align-items: end; }
+    .col-12 { grid-column: span 12; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+    .col-3 { grid-column: span 3; }
+    @media (max-width: 700px){ .col-6,.col-4,.col-3 { grid-column: span 12; } }
+
+    .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+    button, .btn {
+      appearance: none; border: 1px solid #2e385f; background: linear-gradient(180deg, #1c2753, #141c3c);
+      color: var(--text); padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 600;
+      transition: transform .05s ease, box-shadow .2s ease, border-color .2s ease; user-select: none;
+    }
+    button:hover { box-shadow: 0 12px 28px rgba(22,29,55,.45); border-color: var(--accent); }
+    button:active { transform: translateY(1px); }
+    .btn-accent { border-color: color-mix(in srgb, var(--accent) 60%, #fff 0%); background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 25%, #000 0%), #0f1630); }
+    .btn-good { border-color: #2e6151; background: linear-gradient(180deg, #1f594c, #123d34); }
+    .btn-danger { border-color: #5f2e2e; background: linear-gradient(180deg, #5a2626, #361616); }
+    .hint { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+
+    .qr-wrap { display: grid; place-items: center; padding: 22px; }
+    .qr-stage { width: 100%; aspect-ratio: 1/1; display: grid; place-items: center; background: #0a0f26; border-radius: 14px; border: 1px dashed #2b3561; }
+    .qr-stage svg, .qr-stage img, .qr-stage canvas { max-width: 92%; max-height: 92%; }
+
+    .footer { color: var(--muted); font-size: 12.5px; text-align: center; padding-top: 12px; }
+    a { color: var(--accent-2); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="dot" aria-hidden="true"></div>
+      <h1>ตัวอย่างเว็บสร้าง QR Code (HTML ไฟล์เดียว)</h1>
+    </header>
+
+    <div class="panels">
+      <!-- Controls -->
+      <section class="card" aria-labelledby="controls-title">
+        <div class="head"><strong id="controls-title">ตั้งค่า / ข้อความ</strong><span id="status" aria-live="polite" class="hint"></span></div>
+        <div class="body">
+          <div class="row" style="margin-bottom:12px;">
+            <div class="col-12">
+              <label for="text">ข้อความหรือ URL ที่ต้องการเข้ารหัส</label>
+              <textarea id="text" placeholder="พิมพ์ข้อความหรือ URL เช่น https://example.com หรือ ข้อความภาษาไทยได้เลย"></textarea>
+              <div class="hint">รองรับภาษาไทยและอีโมจิ (UTF‑8) · ปริมาณข้อมูลมากขึ้น ⇒ ขนาดโมดูลมากขึ้น</div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-bottom:12px;">
+            <div class="col-6">
+              <label for="size">ขนาดภาพ (พิกเซล)</label>
+              <input id="size" type="number" min="128" max="2048" step="1" value="512" />
+              <div class="hint">128–2048 px</div>
+            </div>
+            <div class="col-6">
+              <label for="margin">ขอบเงียบ (margin, โมดูล)</label>
+              <input id="margin" type="number" min="0" max="16" step="1" value="4" />
+              <div class="hint">แนะนำ ≥ 4 โมดูล เพื่อให้อ่านง่าย</div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-bottom:12px;">
+            <div class="col-4">
+              <label for="ecl">Error Correction</label>
+              <select id="ecl">
+                <option value="L">L — 7%</option>
+                <option value="M" selected>M — 15%</option>
+                <option value="Q">Q — 25%</option>
+                <option value="H">H — 30%</option>
+              </select>
+            </div>
+            <div class="col-4">
+              <label for="fg">สีลาย (foreground)</label>
+              <input id="fg" type="color" value="#000000" />
+            </div>
+            <div class="col-4">
+              <label for="bg">สีพื้นหลัง</label>
+              <input id="bg" type="color" value="#ffffff" />
+            </div>
+          </div>
+
+          <div class="btns" style="margin-top:8px;">
+            <button id="btn-generate" class="btn-accent">สร้าง / อัปเดต QR</button>
+            <button id="btn-download-png" class="btn-good">ดาวน์โหลด PNG</button>
+            <button id="btn-download-svg" class="">ดาวน์โหลด SVG</button>
+            <button id="btn-copy" class="">คัดลอกเป็นรูปภาพ</button>
+            <button id="btn-clear" class="btn-danger">ล้างค่า</button>
+          </div>
+          <div class="hint" id="meta"></div>
+        </div>
+      </section>
+
+      <!-- Preview -->
+      <section class="card" aria-labelledby="preview-title">
+        <div class="head"><strong id="preview-title">แสดงตัวอย่าง</strong><span class="hint" id="sizeLabel"></span></div>
+        <div class="body qr-wrap">
+          <div id="stage" class="qr-stage" aria-live="polite" aria-busy="false"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">สร้างด้วย <a href="https://github.com/kazuhikoarase/qrcode-generator" target="_blank" rel="noopener">qrcode-generator</a> (MIT). บันทึกไฟล์นี้เป็น <code>.html</code> แล้วเปิดด้วยเบราว์เซอร์ได้ทันที</div>
+  </div>
+
+<script>
+(function(){
+  // Use UTF‑8 for Thai/emoji
+  if (window.qrcode && qrcode.stringToBytesFuncs && qrcode.stringToBytesFuncs['UTF-8']) {
+    qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+  }
+
+  const $ = (sel) => document.querySelector(sel);
+  const els = {
+    text: $('#text'), size: $('#size'), margin: $('#margin'), ecl: $('#ecl'), fg: $('#fg'), bg: $('#bg'),
+    btnGen: $('#btn-generate'), btnPNG: $('#btn-download-png'), btnSVG: $('#btn-download-svg'), btnCopy: $('#btn-copy'), btnClear: $('#btn-clear'),
+    stage: $('#stage'), status: $('#status'), meta: $('#meta'), sizeLabel: $('#sizeLabel')
+  };
+
+  let current = { svg: '', size: 512, ecl: 'M', margin: 4, fg: '#000000', bg: '#ffffff', modules: 0 };
+  els.text.value = 'https://example.com';
+
+  function setBusy(b){ els.stage.setAttribute('aria-busy', String(!!b)); }
+  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+
+  function makeQR() {
+    const txt = (els.text.value || '').trim();
+    const size = clamp(parseInt(els.size.value||512,10), 128, 2048);
+    const margin = clamp(parseInt(els.margin.value||4,10), 0, 16);
+    const ecl = els.ecl.value || 'M';
+    const fg = els.fg.value || '#000000';
+    const bg = els.bg.value || '#ffffff';
+
+    if (!txt) {
+      els.stage.innerHTML = '<div class="hint" style="padding:18px;text-align:center;">พิมพ์ข้อความหรือ URL แล้วกด “สร้าง / อัปเดต QR”</div>';
+      els.btnPNG.disabled = els.btnSVG.disabled = els.btnCopy.disabled = true;
+      els.sizeLabel.textContent = '';
+      els.meta.textContent = '';
+      return;
+    }
+
+    setBusy(true);
+    const qr = qrcode(0, ecl); // typeNumber=0 auto
+    qr.addData(txt);
+    qr.make();
+    const modules = qr.getModuleCount();
+    const cellSize = Math.max(1, Math.floor(size / (modules + 2*margin)));
+    const real = cellSize * (modules + 2*margin);
+
+    // Build SVG and recolor
+    let rawSvg = qr.createSvgTag({ cellSize: cellSize, margin: margin });
+    // Insert background + recolor fills
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rawSvg, 'image/svg+xml');
+    const svgEl = doc.documentElement;
+    // Normalize width / height to the computed real size
+    svgEl.setAttribute('width', real);
+    svgEl.setAttribute('height', real);
+    // Background rectangle
+    const rect = doc.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', '0'); rect.setAttribute('y', '0');
+    rect.setAttribute('width', '100%'); rect.setAttribute('height', '100%');
+    rect.setAttribute('fill', bg);
+    svgEl.insertBefore(rect, svgEl.firstChild);
+    // Recolor modules
+    doc.querySelectorAll('[fill]').forEach(node => {
+      const f = (node.getAttribute('fill')||'').toLowerCase();
+      if (f === '#000000' || f === '#000' || f === 'black') node.setAttribute('fill', fg);
+    });
+
+    const svg = new XMLSerializer().serializeToString(svgEl);
+
+    // Show
+    els.stage.innerHTML = svg;
+    els.btnPNG.disabled = els.btnSVG.disabled = els.btnCopy.disabled = false;
+    els.status.textContent = 'พร้อมใช้งาน';
+    els.sizeLabel.textContent = `ขนาดจอแสดงผล: ${real}×${real} px`;
+    els.meta.textContent = `โมดูล: ${modules} × ${modules} · cellSize: ${cellSize}px · margin: ${margin} โมดูล`;
+
+    current = { svg, size: real, ecl, margin, fg, bg, modules };
+    setBusy(false);
+  }
+
+  async function downloadPNG(){
+    if (!current.svg) return;
+    const blob = new Blob([current.svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = current.size; canvas.height = current.size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = current.bg; ctx.fillRect(0,0,canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((pngBlob)=>{
+        if (!pngBlob) return;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(pngBlob);
+        a.download = `qrcode_${current.size}px_${current.ecl}.png`;
+        document.body.appendChild(a); a.click(); a.remove();
+        URL.revokeObjectURL(a.href); URL.revokeObjectURL(url);
+      }, 'image/png');
+    };
+    img.onerror = ()=>{ alert('ไม่สามารถเรนเดอร์ภาพจาก SVG ได้'); URL.revokeObjectURL(url); };
+    img.src = url;
+  }
+
+  function downloadSVG(){
+    if (!current.svg) return;
+    const blob = new Blob([current.svg], { type: 'image/svg+xml;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `qrcode_${current.size}px_${current.ecl}.svg`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function copyPNG(){
+    if (!current.svg || !navigator.clipboard || !window.ClipboardItem) {
+      alert('เบราว์เซอร์ไม่รองรับการคัดลอกรูปภาพไปคลิปบอร์ด');
+      return;
+    }
+    const blob = new Blob([current.svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = current.size; canvas.height = current.size;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = current.bg; ctx.fillRect(0,0,canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(async (pngBlob)=>{
+        try {
+          await navigator.clipboard.write([ new ClipboardItem({ 'image/png': pngBlob }) ]);
+          els.status.textContent = 'คัดลอกรูปภาพแล้ว ✔';
+        } catch (e) {
+          alert('คัดลอกไม่สำเร็จ: ' + e.message);
+        } finally {
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png');
+    };
+    img.onerror = ()=>{ alert('ไม่สามารถเรนเดอร์ภาพจาก SVG ได้'); URL.revokeObjectURL(url); };
+    img.src = url;
+  }
+
+  function clearAll(){
+    els.text.value = '';
+    els.size.value = 512;
+    els.margin.value = 4;
+    els.ecl.value = 'M';
+    els.fg.value = '#000000';
+    els.bg.value = '#ffffff';
+    els.stage.innerHTML = '';
+    els.meta.textContent = '';
+    els.sizeLabel.textContent = '';
+    els.status.textContent = '';
+    current = { svg: '', size: 512, ecl: 'M', margin: 4, fg: '#000000', bg: '#ffffff', modules: 0 };
+  }
+
+  // Wire events
+  els.btnGen.addEventListener('click', (e)=>{ e.preventDefault(); makeQR(); });
+  els.btnPNG.addEventListener('click', (e)=>{ e.preventDefault(); downloadPNG(); });
+  els.btnSVG.addEventListener('click', (e)=>{ e.preventDefault(); downloadSVG(); });
+  els.btnCopy.addEventListener('click', (e)=>{ e.preventDefault(); copyPNG(); });
+  els.btnClear.addEventListener('click', (e)=>{ e.preventDefault(); clearAll(); });
+
+  // Auto-generate on input changes (debounced)
+  let t;
+  ['input','change'].forEach(evt => {
+    [els.text, els.size, els.margin, els.ecl, els.fg, els.bg].forEach(el => el.addEventListener(evt, () => {
+      clearTimeout(t); t = setTimeout(makeQR, 260);
+    }));
+  });
+
+  // First render
+  makeQR();
+})();
+</script>
+</body>
+</html>
