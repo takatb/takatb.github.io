@@ -1,17 +1,425 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Redirecting...</title>
-    <link rel="stylesheet" href="path/to/watermark.css">
-  </head>
-  <body>
-    <h1>Hello</h1>
-    <a href="./mass_spring_simulation.html">mass_spring_simulation.html</a>
-    <a href="./pendulum_simulation.html">pendulum_simulation.html</a>
-    <a href="./qr_gen.html">qr_gen.html</a>
-    <a href="https://takatb.github.io/vite_react_ts_testAPP/">test app</a>
-    <p>This page has moved. <a href="http://tactics.thddns.net:3930">click here</a>.</p>
-    <div class="watermark"></div>
-  </body>
-</html>
+<html lang="th" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>takatb — Engineering Tools</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* === TOKENS === */
+    :root, [data-theme="light"] {
+      --color-bg:             #f7f6f2;
+      --color-surface:        #f9f8f5;
+      --color-surface-2:      #ffffff;
+      --color-border:         rgba(40,37,29,0.10);
+      --color-text:           #28251d;
+      --color-text-muted:     #6b6960;
+      --color-text-faint:     #a8a79f;
+      --color-primary:        #01696f;
+      --color-primary-hover:  #0c4e54;
+      --color-primary-highlight: #e0eeec;
+      --color-accent:         #437a22;
+      --color-accent-highlight: #e4edda;
+      --color-purple:         #7a39bb;
+      --color-purple-highlight: #ece4f5;
+      --shadow-sm: 0 1px 3px rgba(40,37,29,0.07);
+      --shadow-md: 0 4px 14px rgba(40,37,29,0.09);
+      --radius-md: 0.625rem;
+      --radius-lg: 1rem;
+      --radius-full: 9999px;
+      --font-body: 'IBM Plex Sans Thai', 'Helvetica Neue', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --transition: 180ms cubic-bezier(0.16,1,0.3,1);
+    }
+    [data-theme="dark"] {
+      --color-bg:             #161513;
+      --color-surface:        #1c1b18;
+      --color-surface-2:      #232219;
+      --color-border:         rgba(200,196,185,0.10);
+      --color-text:           #d0cfc8;
+      --color-text-muted:     #7d7b74;
+      --color-text-faint:     #545249;
+      --color-primary:        #4f98a3;
+      --color-primary-hover:  #227f8b;
+      --color-primary-highlight: #1f3535;
+      --color-accent:         #6daa45;
+      --color-accent-highlight: #253420;
+      --color-purple:         #a86fdf;
+      --color-purple-highlight: #2e2040;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.25);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.35);
+    }
+    @media (prefers-color-scheme:dark){:root:not([data-theme]){
+      --color-bg:#161513;--color-surface:#1c1b18;--color-surface-2:#232219;
+      --color-border:rgba(200,196,185,0.10);--color-text:#d0cfc8;
+      --color-text-muted:#7d7b74;--color-text-faint:#545249;
+      --color-primary:#4f98a3;--color-primary-hover:#227f8b;
+      --color-primary-highlight:#1f3535;--color-accent:#6daa45;
+      --color-accent-highlight:#253420;--color-purple:#a86fdf;
+      --color-purple-highlight:#2e2040;
+      --shadow-sm:0 1px 3px rgba(0,0,0,0.25);--shadow-md:0 4px 14px rgba(0,0,0,0.35);
+    }}
 
+    /* === BASE === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+      color: var(--color-text);
+      background: var(--color-bg);
+      line-height: 1.65;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+    /* === LAYOUT === */
+    .container {
+      max-width: 860px;
+      margin-inline: auto;
+      padding-inline: clamp(1.25rem, 5vw, 2.5rem);
+    }
+
+    /* === HEADER === */
+    header {
+      padding-block: 1.5rem;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg);
+      position: sticky; top: 0; z-index: 10;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: var(--color-primary);
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .logo-icon svg { width: 18px; height: 18px; }
+
+    .theme-toggle {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--color-text-muted);
+      transition: background var(--transition), border-color var(--transition), color var(--transition);
+    }
+    .theme-toggle:hover {
+      background: var(--color-surface-2);
+      color: var(--color-text);
+    }
+
+    /* === HERO === */
+    .hero {
+      padding-block: clamp(2.5rem, 6vw, 4rem) clamp(2rem, 4vw, 3rem);
+    }
+    .hero-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      background: var(--color-primary-highlight);
+      padding: 0.3rem 0.75rem;
+      border-radius: var(--radius-full);
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.6rem, 1.2rem + 2vw, 2.4rem);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .hero p {
+      font-size: clamp(0.9rem, 0.85rem + 0.2vw, 1rem);
+      color: var(--color-text-muted);
+      max-width: 58ch;
+      line-height: 1.7;
+    }
+
+    /* === SECTION === */
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-text-faint);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    /* === CARDS GRID === */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+      gap: 1rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      box-shadow: var(--shadow-sm);
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+      text-decoration: none;
+      color: inherit;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      border-color: rgba(1,105,111,0.25);
+    }
+
+    .card-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 0.875rem;
+      flex-shrink: 0;
+      font-size: 1.25rem;
+    }
+    .icon-teal   { background: var(--color-primary-highlight); color: var(--color-primary); }
+    .icon-green  { background: var(--color-accent-highlight);  color: var(--color-accent); }
+    .icon-purple { background: var(--color-purple-highlight);  color: var(--color-purple); }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      letter-spacing: -0.01em;
+    }
+    .card-desc {
+      font-size: 0.83rem;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      flex: 1;
+    }
+    .card-tag {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-full);
+      margin-top: 0.875rem;
+      width: fit-content;
+      font-family: var(--font-mono);
+    }
+    .tag-teal   { background: var(--color-primary-highlight); color: var(--color-primary); }
+    .tag-green  { background: var(--color-accent-highlight);  color: var(--color-accent); }
+    .tag-purple { background: var(--color-purple-highlight);  color: var(--color-purple); }
+
+    /* === LINK ITEM === */
+    .link-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      margin-bottom: 0.6rem;
+      transition: background var(--transition), border-color var(--transition);
+      text-decoration: none;
+      color: var(--color-text);
+    }
+    .link-item:hover {
+      background: var(--color-surface-2);
+      border-color: rgba(1,105,111,0.25);
+    }
+    .link-item-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .link-item-sub {
+      font-size: 0.78rem;
+      color: var(--color-text-muted);
+    }
+    .link-item-arrow {
+      margin-left: auto;
+      color: var(--color-text-faint);
+      font-size: 1rem;
+      transition: transform var(--transition), color var(--transition);
+    }
+    .link-item:hover .link-item-arrow {
+      transform: translateX(3px);
+      color: var(--color-primary);
+    }
+
+    /* === FOOTER === */
+    footer {
+      margin-top: 3rem;
+      padding-block: 1.5rem;
+      border-top: 1px solid var(--color-border);
+      font-size: 0.78rem;
+      color: var(--color-text-faint);
+      text-align: center;
+    }
+    footer a {
+      color: var(--color-primary);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="container header-inner">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+          </svg>
+        </div>
+        takatb
+      </div>
+      <button class="theme-toggle" data-theme-toggle aria-label="Switch theme">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+    <div class="container">
+      <!-- HERO -->
+      <section class="hero">
+        <div class="hero-label">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="5"/></svg>
+          Engineering Tools
+        </div>
+        <h1>Simulations &amp; Utilities</h1>
+        <p>รวมเครื่องมือและโปรแกรมจำลองทางวิศวกรรมสำหรับการเรียนการสอน
+          ใช้งานได้บน browser โดยไม่ต้องติดตั้งโปรแกรมเพิ่มเติม</p>
+      </section>
+
+      <!-- SIMULATIONS -->
+      <p class="section-title">Mechanical Simulations</p>
+      <div class="cards">
+
+        <a href="./mass_spring_simulation.html" class="card">
+          <div class="card-icon icon-teal">⚙️</div>
+          <div class="card-title">Mass-Spring System</div>
+          <div class="card-desc">จำลองการสั่นของระบบ mass-spring-damper
+            ปรับค่า mass, stiffness และ damping coefficient
+            แล้วดูผลตอบสนองแบบ real-time</div>
+          <span class="card-tag tag-teal">Vibration Analysis</span>
+        </a>
+
+        <a href="./pendulum_simulation.html" class="card">
+          <div class="card-icon icon-green">🔵</div>
+          <div class="card-title">Pendulum Simulation</div>
+          <div class="card-desc">จำลองการแกว่งของลูกตุ้มอย่างง่าย
+            ศึกษาความสัมพันธ์ระหว่างความยาว ความเร็ว
+            และพลังงานของระบบ</div>
+          <span class="card-tag tag-green">Dynamics</span>
+        </a>
+
+      </div>
+
+      <!-- UTILITY TOOLS -->
+      <p class="section-title">Utility Tools</p>
+      <div class="cards" style="margin-bottom:2.5rem;">
+        <a href="./qr_gen.html" class="card">
+          <div class="card-icon icon-purple">📱</div>
+          <div class="card-title">QR Code Generator</div>
+          <div class="card-desc">สร้าง QR Code จาก URL หรือข้อความ
+            พร้อม download เป็นไฟล์ภาพ
+            ใช้งานได้แบบ offline โดยไม่ต้องส่งข้อมูลออกนอก</div>
+          <span class="card-tag tag-purple">Offline-ready</span>
+        </a>
+      </div>
+
+      <!-- EXTERNAL LINKS -->
+      <p class="section-title">External Projects</p>
+
+      <a href="https://takatb.github.io/vite_react_ts_testAPP/" target="_blank" rel="noopener noreferrer" class="link-item">
+        <div style="width:36px;height:36px;border-radius:0.5rem;background:var(--color-primary-highlight);display:flex;align-items:center;justify-content:center;color:var(--color-primary);flex-shrink:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </div>
+        <div>
+          <div class="link-item-label">Vite + React + TypeScript Test App</div>
+          <div class="link-item-sub">takatb.github.io/vite_react_ts_testAPP</div>
+        </div>
+        <span class="link-item-arrow">→</span>
+      </a>
+
+      <a href="http://tactics.thddns.net:3930" target="_blank" rel="noopener noreferrer" class="link-item">
+        <div style="width:36px;height:36px;border-radius:0.5rem;background:var(--color-accent-highlight);display:flex;align-items:center;justify-content:center;color:var(--color-accent);flex-shrink:0;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div class="link-item-label">Self-hosted Server</div>
+          <div class="link-item-sub">tactics.thddns.net:3930</div>
+        </div>
+        <span class="link-item-arrow">→</span>
+      </a>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      Built by <a href="https://github.com/takatb" target="_blank" rel="noopener noreferrer">takatb</a> &middot;
+      Hosted on <a href="https://pages.github.com" target="_blank" rel="noopener noreferrer">GitHub Pages</a>
+    </div>
+  </footer>
+
+  <script>
+    (function(){
+      var t = document.querySelector('[data-theme-toggle]');
+      var r = document.documentElement;
+      var d = matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light';
+      r.setAttribute('data-theme', d);
+      updateIcon();
+      t && t.addEventListener('click', function(){
+        d = d === 'dark' ? 'light' : 'dark';
+        r.setAttribute('data-theme', d);
+        t.setAttribute('aria-label', 'Switch to ' + (d==='dark'?'light':'dark') + ' mode');
+        updateIcon();
+      });
+      function updateIcon(){
+        if(!t) return;
+        t.innerHTML = d === 'dark'
+          ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+          : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      }
+    })();
+  </script>
+</body>
+</html>
