@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thailand Cooling Load Table - ASHRAE CLTD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9;
+      --color-surface-offset: #f3f0ec; --color-border: #d4d1ca; --color-divider: #dcd9d5;
+      --color-text: #28251d; --color-text-muted: #6f6d68; --color-text-faint: #9b9994;
+      --color-text-inverse: #f9f8f4; --color-primary: #01696f; --color-primary-hover: #0c4e54;
+      --color-primary-highlight: #cedcd8; --color-warning: #964219; --color-error: #a12c7b;
+      --shadow-sm: 0 1px 2px oklch(0.2 0.01 80 / 0.06); --shadow-md: 0 4px 12px oklch(0.2 0.01 80 / 0.08);
+      --shadow-lg: 0 12px 32px oklch(0.2 0.01 80 / 0.12); --radius-sm: .375rem; --radius-md: .5rem;
+      --radius-lg: .75rem; --radius-xl: 1rem; --radius-full: 9999px; --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+      --font-body: 'IBM Plex Sans Thai', system-ui, sans-serif; --font-display: 'IBM Plex Sans Thai', system-ui, sans-serif;
+      --content-default: 1120px;
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d; --color-surface-offset: #22211f;
+      --color-border: #393836; --color-divider: #262523; --color-text: #e1dfdb; --color-text-muted: #b0ada7;
+      --color-text-faint: #7c7974; --color-text-inverse: #2b2a28; --color-primary: #4f98a3; --color-primary-hover: #227f8b;
+      --color-primary-highlight: #313b3b; --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2); --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3); --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);
+    }
+    *,:before,:after{box-sizing:border-box;margin:0;padding:0}
+    html{-webkit-text-size-adjust:none;text-size-adjust:none;scroll-behavior:smooth}
+    body{min-height:100dvh;line-height:1.6;font-family:var(--font-body);font-size:var(--text-base);color:var(--color-text);background:var(--color-bg)}
+    img,svg{display:block;max-width:100%;height:auto}
+    button,input,select{font:inherit;color:inherit}
+    h1,h2,h3{line-height:1.15;text-wrap:balance}
+    p{max-width:78ch;text-wrap:pretty}
+    a,button,input,select{transition:background var(--transition-interactive),color var(--transition-interactive),border-color var(--transition-interactive),box-shadow var(--transition-interactive)}
+    :focus-visible{outline:2px solid var(--color-primary);outline-offset:3px;border-radius:var(--radius-sm)}
+    .shell{max-width:var(--content-default);margin-inline:auto;padding:var(--space-4)}
+    .skip-link{position:absolute;left:-9999px;top:auto}.skip-link:focus{left:var(--space-4);top:var(--space-4);background:var(--color-primary);color:var(--color-text-inverse);padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);z-index:10}
+    header{padding-block:var(--space-8) var(--space-6)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);margin-bottom:var(--space-6)}
+    .brand{display:flex;align-items:center;gap:var(--space-3)}
+    .logo{width:42px;height:42px;color:var(--color-primary)}
+    .brand-title{font-size:var(--text-sm);font-weight:700;letter-spacing:.02em;text-transform:uppercase;color:var(--color-text-muted)}
+    h1{font-family:var(--font-display);font-size:var(--text-2xl);font-weight:700;max-width:18ch}
+    .lead{margin-top:var(--space-4);color:var(--color-text-muted)}
+    .theme-toggle{min-width:44px;min-height:44px;border:1px solid var(--color-border);border-radius:var(--radius-full);padding:var(--space-2);display:grid;place-items:center;background:var(--color-surface);box-shadow:var(--shadow-sm)}
+    .grid{display:grid;grid-template-columns:360px 1fr;gap:var(--space-6)}
+    .panel,.table-card,.note-card{background:var(--color-surface);border:1px solid color-mix(in oklab, var(--color-text) 12%, transparent);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm)}
+    .panel{padding:var(--space-5);position:sticky;top:var(--space-4);align-self:start}
+    .panel h2,.table-card h2,.note-card h2{font-size:var(--text-lg);margin-bottom:var(--space-4)}
+    .field{display:grid;gap:var(--space-2);margin-bottom:var(--space-4)}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+    label{font-size:var(--text-sm);font-weight:600}
+    input,select{width:100%;padding:.78rem .9rem;border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface-2)}
+    .chips{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+    .chip{border:1px solid var(--color-border);background:var(--color-surface-2);border-radius:var(--radius-full);padding:.35rem .75rem;font-size:var(--text-xs);color:var(--color-text-muted)}
+    .summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-3);margin-top:var(--space-4)}
+    .metric{background:var(--color-surface-offset);border-radius:var(--radius-lg);padding:var(--space-4)}
+    .metric .label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-muted)}
+    .metric .value{font-size:var(--text-xl);font-weight:700;margin-top:var(--space-2)}
+    .table-card{overflow:hidden}
+    .table-head{display:flex;justify-content:space-between;align-items:end;gap:var(--space-4);padding:var(--space-5);border-bottom:1px solid var(--color-divider);background:linear-gradient(180deg,var(--color-surface),var(--color-surface-2))}
+    .table-wrap{overflow:auto}
+    table{width:100%;border-collapse:collapse;min-width:920px}
+    th,td{padding:.85rem .75rem;border-bottom:1px solid var(--color-divider);text-align:right;vertical-align:middle;white-space:nowrap}
+    th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--color-surface);z-index:1}
+    thead th{position:sticky;top:0;background:var(--color-surface-2);z-index:2;font-size:var(--text-sm)}
+    tbody tr:hover td{background:color-mix(in oklab,var(--color-primary) 4%,var(--color-surface))}
+    tbody tr:hover td:first-child{background:color-mix(in oklab,var(--color-primary) 6%,var(--color-surface))}
+    .section{margin-top:var(--space-6)}
+    .note-card{padding:var(--space-5)}
+    .formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--color-surface-offset);padding:var(--space-3);border-radius:var(--radius-md);display:block;overflow:auto;font-size:var(--text-sm)}
+    .muted{color:var(--color-text-muted)}
+    .badge{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem .7rem;border-radius:var(--radius-full);background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+    footer{padding:var(--space-8) 0 var(--space-10);color:var(--color-text-muted)}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}.panel{position:static}.summary{grid-template-columns:1fr 1fr}}
+    @media (max-width: 640px){.field-row,.summary,.table-head{grid-template-columns:1fr;display:grid}.shell{padding:var(--space-3)}h1{max-width:100%}}
+    @media print{.theme-toggle,.panel .muted:last-child{display:none}.panel{position:static}body{background:#fff;color:#000}.panel,.table-card,.note-card{box-shadow:none;border:1px solid #bbb}}
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">ข้ามไปยังเนื้อหา</a>
+  <div class="shell">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <svg class="logo" viewBox="0 0 64 64" fill="none" aria-label="Cooling Load Thailand logo" role="img">
+            <rect x="8" y="10" width="48" height="44" rx="12" stroke="currentColor" stroke-width="3"></rect>
+            <path d="M20 34h24M32 20v28M23 25c2.5 1.5 4 4.2 4 7s-1.5 5.5-4 7M41 25c-2.5 1.5-4 4.2-4 7s1.5 5.5 4 7" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+          <div>
+            <div class="brand-title">Cooling Load Thailand</div>
+            <div class="muted">ASHRAE CLTD for Thailand</div>
+          </div>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch theme"></button>
+      </div>
+      <span class="badge">Thailand-adapted CLTD</span>
+      <h1>ตารางคำนวณ Cooling Load แบบ ASHRAE สำหรับประเทศไทย</h1>
+      <p class="lead">ไฟล์นี้ใช้วิธี CLTD แบบ ASHRAE สำหรับส่วนผนังและหลังคา โดยเลือกใช้ค่า CLTD ที่พัฒนาจากข้อมูลอากาศกรุงเทพฯ และวัสดุอาคารที่ใช้ทั่วไปในประเทศไทย เพื่อให้เหมาะกับการคำนวณเบื้องต้นในบริบทไทยมากกว่าการใช้ตารางอเมริกาโดยตรง</p>
+    </header>
+
+    <main id="main" class="grid">
+      <aside class="panel" aria-label="แบบฟอร์มคำนวณ">
+        <h2>ข้อมูลสำหรับคำนวณ</h2>
+        <div class="field-row">
+          <div class="field">
+            <label for="component">ชนิดองค์ประกอบ</label>
+            <select id="component">
+              <option value="wall">ผนังภายนอก</option>
+              <option value="roof">หลังคา</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="hour">เวลา</label>
+            <select id="hour"></select>
+          </div>
+        </div>
+
+        <div class="field-row wall-only">
+          <div class="field">
+            <label for="wallType">ประเภทผนัง</label>
+            <select id="wallType"></select>
+          </div>
+          <div class="field">
+            <label for="orientation">ทิศผนัง</label>
+            <select id="orientation">
+              <option>N</option><option>NE</option><option>E</option><option>SE</option>
+              <option>S</option><option>SW</option><option>W</option><option>NW</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field roof-only" style="display:none">
+          <label for="roofType">ประเภทหลังคา</label>
+          <select id="roofType"></select>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="area">พื้นที่ A (m²)</label>
+            <input id="area" type="number" min="0" step="0.01" value="12">
+          </div>
+          <div class="field">
+            <label for="uvalue">ค่า U (W/m²·°C)</label>
+            <input id="uvalue" type="number" min="0" step="0.001" value="3.950">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="ti">อุณหภูมิภายในจริง Ti (°C)</label>
+            <input id="ti" type="number" step="0.1" value="25">
+          </div>
+          <div class="field">
+            <label for="cltdBase">ชุดข้อมูล CLTD</label>
+            <select id="cltdBase">
+              <option value="second" selected>Second set (เน้น peak load)</option>
+              <option value="first">First set (ใช้งานทั่วไป)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="summary" aria-live="polite">
+          <div class="metric">
+            <div class="label">CLTD ที่ใช้</div>
+            <div class="value" id="cltdValue">-</div>
+          </div>
+          <div class="metric">
+            <div class="label">Cooling Load</div>
+            <div class="value" id="loadValue">-</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="chips">
+            <span class="chip">สูตรหลัก: Q = U × A × CLTD</span>
+            <span class="chip">ฐานข้อมูล Ti = 25°C</span>
+            <span class="chip">เหมาะกับงาน preliminary sizing</span>
+          </div>
+        </div>
+
+        <p class="muted section">หากอุณหภูมิภายในที่ออกแบบไม่เท่ากับ 25°C ระบบจะปรับค่า CLTD อย่างง่ายด้วยความสัมพันธ์ CLTD<sub>corr</sub> = CLTD<sub>table</sub> + (25 − Ti) เพื่อสะท้อนว่าตารางอ้างอิงนี้ตั้งอยู่บนอุณหภูมิภายใน 25°C</p>
+      </aside>
+
+      <section>
+        <article class="table-card">
+          <div class="table-head">
+            <div>
+              <h2>ตาราง CLTD</h2>
+              <p class="muted">เลือกชนิดองค์ประกอบและชุดข้อมูลด้านซ้าย ตารางจะเปลี่ยนตามข้อมูลอ้างอิงที่เลือก</p>
+            </div>
+            <div class="muted" id="tableCaption">ผนังภายนอก</div>
+          </div>
+          <div class="table-wrap">
+            <table id="cltdTable" aria-describedby="tableCaption"></table>
+          </div>
+        </article>
+
+        <article class="note-card section">
+          <h2>หลักการที่ใช้ในไฟล์นี้</h2>
+          <p class="muted">ส่วนการนำความร้อนผ่านผนังและหลังคาใช้แนวคิดเดียวกับ ASHRAE CLTD method ซึ่งคำนวณโหลดจากผลคูณของค่า U, พื้นที่ A และค่า CLTD ในช่วงเวลาที่สนใจ โดยบทความวิจัยของไทยได้พัฒนาตาราง CLTD ใหม่จากข้อมูลอากาศกรุงเทพฯ และวัสดุอาคารที่ใช้ทั่วไปในประเทศไทย</p>
+          <span class="formula">Q = U × A × CLTD<sub>corr</sub></span>
+          <p class="muted" style="margin-top:var(--space-3)">ไฟล์นี้ครอบคลุมเฉพาะ sensible load ผ่านผนังและหลังคาเท่านั้น ยังไม่รวมกระจก, solar gain through fenestration, แสงสว่าง, คน, อุปกรณ์ไฟฟ้า, ventilation และ infiltration ซึ่งต้องคำนวณเพิ่มหากใช้เพื่อ sizing ระบบปรับอากาศทั้งห้อง</p>
+        </article>
+
+        <article class="note-card section">
+          <h2>ค่าประเภทวัสดุที่บันทึกไว้</h2>
+          <p class="muted">ค่าประเภทผนังและหลังคาในไฟล์นี้อ้างอิงหมายเลขชนิดจากงานวิจัยไทย พร้อมค่า U ตามตารางต้นฉบับ เพื่อให้ผู้ใช้เลือกชนิดวัสดุได้รวดเร็ว หากต้องใช้วัสดุอื่น สามารถกรอกค่า U เองได้ทันที</p>
+          <div class="table-wrap" style="margin-top:var(--space-4)">
+            <table>
+              <thead>
+                <tr><th>รหัส</th><th>รายละเอียด</th><th>U (W/m²·°C)</th></tr>
+              </thead>
+              <tbody id="materialTable"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      เอกสาร HTML นี้ออกแบบเพื่อใช้เป็นตารางคำนวณเบื้องต้นสำหรับประเทศไทย และสามารถเปิดใช้งานได้ทันทีในเบราว์เซอร์โดยไม่ต้องติดตั้งโปรแกรมเพิ่ม
+    </footer>
+  </div>
+
+  <script>
+    const wallMeta = {
+      1: { name: 'Wall 1 - อิฐฉาบปูน 150 มม.', u: 1.222 },
+      2: { name: 'Wall 2 - ผนังมีฉนวนกลาง', u: 0.111 },
+      3: { name: 'Wall 3 - คอนกรีตบล็อก + gypsum board', u: 1.703 },
+      4: { name: 'Wall 4 - lightweight concrete', u: 3.527 },
+      5: { name: 'Wall 5 - อิฐฉาบปูนรวมหนา 80 มม.', u: 3.950 },
+      6: { name: 'Wall 6 - ผนังสำเร็จรูป superblock', u: 2.936 },
+      7: { name: 'Wall 7 - คอนกรีตบล็อกฉาบปูน', u: 1.333 }
+    };
+
+    const roofMeta = {
+      '1CL': { name: 'Roof 1 (ceiling) - slab 100 มม. + ฉนวน', u: 0.391 },
+      '1NC': { name: 'Roof 1 (no ceiling) - slab 100 มม.', u: 3.448 },
+      '2CL': { name: 'Roof 2 (ceiling) - slab 200 มม. + ฉนวน', u: 0.380 },
+      '2NC': { name: 'Roof 2 (no ceiling) - slab 200 มม.', u: 2.783 },
+      '3CL': { name: 'Roof 3 (ceiling) - concrete tile + ฉนวน', u: 0.536 },
+      '3NC': { name: 'Roof 3 (no ceiling) - concrete tile', u: 4.292 }
+    };
+
+    const wallFirst = {
+      5: {
+        N:[4,3,3,3,2,3,4,7,10,13,14,15,16,17,17,18,17,16,13,10,8,6,5,5],
+        NE:[4,3,3,3,2,3,7,13,20,24,25,23,21,19,18,16,15,12,10,8,7,6,5,4],
+        E:[4,3,3,3,2,3,8,15,23,27,28,25,22,20,18,17,15,13,10,8,7,6,5,4],
+        SE:[4,3,3,3,2,3,6,11,17,20,22,21,19,18,17,16,14,12,10,8,7,6,5,4],
+        S:[4,3,3,2,2,2,3,5,8,10,12,13,14,15,15,15,13,11,9,7,6,5,5,4],
+        SW:[5,4,4,3,3,3,4,5,7,10,12,13,16,19,23,26,27,24,19,14,11,8,7,6],
+        W:[6,5,4,3,3,3,4,6,8,10,12,13,17,22,28,33,35,33,26,19,14,10,8,7],
+        NW:[5,4,4,3,3,3,4,5,7,10,12,13,16,21,25,29,31,30,23,17,13,10,8,6]
+      }
+    };
+
+    const wallSecond = {
+      5: {
+        N:[5,4,4,4,3,4,6,9,11,12,13,14,15,15,16,16,16,15,12,10,8,7,6,5],
+        NE:[5,4,4,4,3,5,12,21,27,30,29,26,22,20,19,17,16,13,11,9,8,7,6,5],
+        E:[5,4,4,4,4,5,13,25,33,36,35,31,26,22,20,18,16,14,11,10,8,7,6,5],
+        SE:[5,4,4,4,4,5,10,18,24,28,28,26,22,20,19,17,16,13,11,9,8,7,6,5],
+        S:[5,4,4,4,3,3,4,6,8,10,12,14,15,16,16,15,14,12,10,8,7,6,6,5],
+        SW:[6,5,5,4,4,4,5,6,8,10,12,14,17,21,25,29,31,27,20,15,12,10,8,7],
+        W:[6,6,5,4,4,4,5,6,8,10,12,14,17,22,29,36,39,34,25,19,14,11,9,8],
+        NW:[6,5,5,4,4,4,5,6,8,10,12,13,16,20,25,31,33,29,22,16,13,10,8,7]
+      }
+    };
+
+    const roofFirst = {
+      '1CL':[14,12,11,9,8,7,7,7,9,12,17,22,27,31,34,36,36,34,31,28,24,21,19,16],
+      '1NC':[6,5,4,3,3,2,3,5,10,16,22,27,31,35,36,35,32,28,23,19,15,12,10,8],
+      '2CL':[21,20,19,18,17,16,15,14,14,15,16,18,20,22,24,26,27,27,27,26,25,24,23,23],
+      '2NC':[16,14,13,12,10,9,8,8,8,10,12,15,18,21,24,26,28,28,27,25,23,21,19,18],
+      '3CL':[12,11,10,8,7,7,7,8,11,16,21,26,31,34,36,36,35,32,28,25,22,19,16,14],
+      '3NC':[6,5,4,3,3,2,4,7,11,17,23,27,31,33,33,32,28,24,20,16,13,11,9,7]
+    };
+
+    const roofSecond = {
+      '1CL':[17,15,14,12,11,10,9,9,12,16,21,27,32,36,39,41,41,39,36,32,28,25,22,19],
+      '1NC':[8,7,6,5,4,3,4,7,13,19,26,32,37,39,40,39,36,31,26,21,17,14,12,10],
+      '2CL':[25,24,22,21,20,19,18,17,17,17,18,19,22,24,26,28,30,31,31,31,30,29,28,26],
+      '2NC':[19,17,15,14,13,11,10,10,11,12,15,18,22,25,28,30,32,32,31,29,27,25,22,20],
+      '3CL':[15,14,12,11,10,9,9,11,15,20,26,32,36,39,41,42,40,36,32,29,25,22,19,17],
+      '3NC':[8,7,6,5,4,4,5,9,15,21,27,32,36,37,38,36,32,27,23,19,16,13,11,9]
+    };
+
+    const hourSel = document.getElementById('hour');
+    const componentSel = document.getElementById('component');
+    const wallTypeSel = document.getElementById('wallType');
+    const orientationSel = document.getElementById('orientation');
+    const roofTypeSel = document.getElementById('roofType');
+    const uInput = document.getElementById('uvalue');
+    const areaInput = document.getElementById('area');
+    const tiInput = document.getElementById('ti');
+    const cltdBaseSel = document.getElementById('cltdBase');
+    const cltdValue = document.getElementById('cltdValue');
+    const loadValue = document.getElementById('loadValue');
+    const cltdTable = document.getElementById('cltdTable');
+    const tableCaption = document.getElementById('tableCaption');
+    const materialTable = document.getElementById('materialTable');
+    const wallOnly = document.querySelector('.wall-only');
+    const roofOnly = document.querySelector('.roof-only');
+
+    for (let i = 1; i <= 24; i++) {
+      const op = document.createElement('option');
+      op.value = i;
+      op.textContent = `${String(i).padStart(2,'0')}:00`;
+      if (i === 15) op.selected = true;
+      hourSel.appendChild(op);
+    }
+
+    Object.entries(wallMeta).forEach(([key, val]) => {
+      const op = document.createElement('option');
+      op.value = key;
+      op.textContent = val.name;
+      if (key === '5') op.selected = true;
+      wallTypeSel.appendChild(op);
+    });
+
+    Object.entries(roofMeta).forEach(([key, val]) => {
+      const op = document.createElement('option');
+      op.value = key;
+      op.textContent = val.name;
+      roofTypeSel.appendChild(op);
+    });
+
+    function getDataset() {
+      return cltdBaseSel.value === 'first' ? { wall: wallFirst, roof: roofFirst, label: 'First set' } : { wall: wallSecond, roof: roofSecond, label: 'Second set' };
+    }
+
+    function updateUValue() {
+      if (componentSel.value === 'wall') {
+        uInput.value = wallMeta[wallTypeSel.value].u.toFixed(3);
+      } else {
+        uInput.value = roofMeta[roofTypeSel.value].u.toFixed(3);
+      }
+    }
+
+    function renderMaterials() {
+      const rows = [];
+      Object.entries(wallMeta).forEach(([k,v]) => rows.push(`<tr><td>Wall ${k}</td><td>${v.name}</td><td>${v.u.toFixed(3)}</td></tr>`));
+      Object.entries(roofMeta).forEach(([k,v]) => rows.push(`<tr><td>Roof ${k}</td><td>${v.name}</td><td>${v.u.toFixed(3)}</td></tr>`));
+      materialTable.innerHTML = rows.join('');
+    }
+
+    function renderTable() {
+      const ds = getDataset();
+      if (componentSel.value === 'wall') {
+        const wallNo = wallTypeSel.value;
+        const data = ds.wall[wallNo];
+        const headers = ['ทิศ', ...Array.from({length:24}, (_,i)=>String(i+1).padStart(2,'0'))];
+        const rows = Object.entries(data).map(([ori, vals]) => `<tr><td>${ori}</td>${vals.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
+        cltdTable.innerHTML = `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody>`;
+        tableCaption.textContent = `ผนังภายนอก ${wallMeta[wallNo].name} — ${ds.label}`;
+      } else {
+        const headers = ['ชนิดหลังคา', ...Array.from({length:24}, (_,i)=>String(i+1).padStart(2,'0'))];
+        const rows = Object.entries(ds.roof).map(([key, vals]) => `<tr><td>${roofMeta[key].name}</td>${vals.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
+        cltdTable.innerHTML = `<thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody>`;
+        tableCaption.textContent = `หลังคา — ${ds.label}`;
+      }
+    }
+
+    function calculate() {
+      const ds = getDataset();
+      const hourIndex = Number(hourSel.value) - 1;
+      const Ti = Number(tiInput.value || 25);
+      const U = Number(uInput.value || 0);
+      const A = Number(areaInput.value || 0);
+      let baseCltd = 0;
+
+      if (componentSel.value === 'wall') {
+        baseCltd = ds.wall[wallTypeSel.value][orientationSel.value][hourIndex];
+      } else {
+        baseCltd = ds.roof[roofTypeSel.value][hourIndex];
+      }
+
+      const correctedCltd = baseCltd + (25 - Ti);
+      const Q = U * A * correctedCltd;
+      cltdValue.textContent = `${correctedCltd.toFixed(1)} °C`;
+      loadValue.textContent = `${Q.toFixed(0)} W`;
+    }
+
+    function syncView() {
+      const isWall = componentSel.value === 'wall';
+      wallOnly.style.display = isWall ? 'grid' : 'none';
+      roofOnly.style.display = isWall ? 'none' : 'block';
+      updateUValue();
+      renderTable();
+      calculate();
+    }
+
+    [componentSel, wallTypeSel, orientationSel, roofTypeSel, hourSel, areaInput, uInput, tiInput, cltdBaseSel].forEach(el => el.addEventListener('input', () => {
+      if (el === componentSel || el === wallTypeSel || el === roofTypeSel || el === cltdBaseSel) renderTable();
+      if (el === componentSel) syncView();
+      else if (el === wallTypeSel || el === roofTypeSel) { updateUValue(); calculate(); }
+      else calculate();
+    }));
+
+    (function(){
+      const t=document.querySelector('[data-theme-toggle]'),r=document.documentElement;
+      let d=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+      const icon = mode => mode==='dark'
+        ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+        : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      r.setAttribute('data-theme',d); t.innerHTML=icon(d);
+      t.addEventListener('click',()=>{d=d==='dark'?'light':'dark';r.setAttribute('data-theme',d);t.innerHTML=icon(d);});
+    })();
+
+    renderMaterials();
+    syncView();
+  </script>
+</body>
+</html>
