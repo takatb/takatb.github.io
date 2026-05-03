@@ -1,0 +1,53 @@
+name: Build Eleventy and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main            # เปลี่ยนให้ตรงกับ default branch คุณ
+  workflow_dispatch:    # เผื่ออยากกดรันเอง
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4    # ดึงโค้ด Eleventy [web:40][web:42]
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"               # ช่วย cache node_modules [web:41][web:49]
+
+      - name: Install dependencies
+        run: npm ci                  # หรือ npm install ตามที่โปรเจกต์ใช้
+
+      - name: Build Eleventy
+        run: npx @11ty/eleventy      # หรือ npm run build-eleventy ถ้าตั้ง script ไว้ [web:41][web:49]
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./_site              # โฟลเดอร์ output จาก Eleventy [web:41][web:49]
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4   # เวอร์ชันใหม่ล่าสุดของ Pages Action [web:53]
