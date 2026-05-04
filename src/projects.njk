@@ -1,0 +1,13 @@
+---
+layout: layout.njk
+title: Projects
+---
+
+<h2>ผลงานทั้งหมด</h2>
+<ul>
+  {% for item in collections.projects | reverse %}
+    <li>
+      <a href="{{ item.url }}">{{ item.data.title }}</a> — {{ item.data.summary }}
+    </li>
+  {% endfor %}
+</ul>

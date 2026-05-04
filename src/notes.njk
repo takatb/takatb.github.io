@@ -1,0 +1,21 @@
+---
+layout: layout.njk
+title: Notes
+permalink: /notes/
+---
+
+<section class="page-intro">
+  <p class="eyebrow">Notes</p>
+  <h2>บันทึกการทดลอง</h2>
+  <p>รวม note สั้น ๆ จากการลองของจริง แยกจากหน้า project เพื่อให้ค้นงานกับบันทึกได้ง่ายขึ้น</p>
+</section>
+
+<ul class="item-list">
+  {% for item in collections.note | reverse %}
+    <li>
+      <a href="{{ item.url }}">{{ item.data.title }}</a><br>
+      <small>{{ item.date.toISOString().slice(0,10) }}</small><br>
+      <span>{{ item.data.summary }}</span>
+    </li>
+  {% endfor %}
+</ul>

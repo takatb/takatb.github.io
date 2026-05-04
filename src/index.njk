@@ -1,0 +1,19 @@
+---
+layout: layout.njk
+title: หน้าแรก
+---
+
+<h2>งานล่าสุด</h2>
+<ul>
+  {% for item in collections.projects | reverse %}
+    {% if loop.index <= 3 %}
+    <li>
+      <a href="{{ item.url }}">{{ item.data.title }}</a><br>
+      <small>{{ item.date.toISOString().slice(0,10) }}</small><br>
+      <span>{{ item.data.summary }}</span>
+    </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+<p><a href="/projects/">ดูทั้งหมด</a></p>

@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+    {% if title %}{{ title }} · ห้องทดลองเล็กๆ{% else %}ห้องทดลองเล็กๆ{% endif %}
+  </title>
+
+  {# SEO พื้นฐานจาก summary ถ้ามี #}
+  {% if summary %}
+    <meta name="description" content="{{ summary }}">
+  {% endif %}
+  <meta name="color-scheme" content="light dark">
+
+  {# ถ้ามีไฟล์ CSS ภายนอก (ปัจจุบันหรือของ Tailwind ที่ build แล้ว) ให้ใส่ตรงนี้ #}
+  <link rel="stylesheet" href="/css/main.css?v=20260504-noto">
+</head>
+<body class="bg-slate-950 text-slate-100">
+  <header class="border-b border-slate-800 bg-slate-950/90 backdrop-blur">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+      <a href="/" class="flex items-baseline gap-2">
+        <span class="text-lg font-semibold tracking-tight">ห้องทดลองเล็กๆ</span>
+      </a>
+      <nav class="flex items-center gap-4 text-sm">
+        <a href="/" class="hover:text-sky-300">Home</a>
+        <a href="/projects/" class="hover:text-sky-300">Projects</a>
+        <a href="/notes/" class="hover:text-sky-300">Notes</a>
+        <a href="/about/" class="hover:text-sky-300">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-8">
+    {# ถ้ามีรูป cover ให้ทำ hero บนสุด #}
+    {% if cover %}
+      <section class="mb-8 grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] items-start">
+        <div class="aspect-video overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+          <img
+            src="{{ cover }}"
+            alt="{{ title or 'Project cover' }}"
+            class="h-full w-full object-cover"
+            loading="lazy"
+          >
+        </div>
+        <div class="space-y-4">
+          {% if projectType or status %}
+            <div class="flex flex-wrap items-center gap-2 text-xs">
+              {% if projectType %}
+                <span class="inline-flex items-center rounded-full bg-sky-500/10 px-3 py-1 text-sky-300 border border-sky-500/30">
+                  {{ projectType | capitalize }}
+                </span>
+              {% endif %}
+              {% if status %}
+                <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-emerald-300 border border-emerald-500/30">
+                  สถานะ: {{ status }}
+                </span>
+              {% endif %}
+            </div>
+          {% endif %}
+
+          <div class="space-y-2">
+            <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">
+              {{ title or 'Untitled project' }}
+            </h1>
+            {% if summary %}
+              <p class="text-sm text-slate-300 leading-relaxed">
+                {{ summary }}
+              </p>
+            {% endif %}
+          </div>
+
+          {# tools #}
+          {% if tools %}
+            <div class="space-y-1">
+              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Tools / Tech
+              </p>
+              <div class="flex flex-wrap gap-2 text-xs">
+                {% for tool in tools %}
+                  <span class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100 border border-slate-700">
+                    {{ tool }}
+                  </span>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          {# links #}
+          {% if links %}
+            <div class="space-y-2">
+              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
+                Links
+              </p>
+              <div class="flex flex-wrap gap-2 text-xs">
+                {% if links.demo %}
+                  <a href="{{ links.demo }}" class="inline-flex items-center rounded-full bg-sky-500 px-3 py-1 text-slate-950 font-medium hover:bg-sky-400">
+                    Demo
+                  </a>
+                {% endif %}
+                {% if links.repo %}
+                  <a href="{{ links.repo }}" class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100 border border-slate-600 hover:border-sky-400">
+                    Source
+                  </a>
+                {% endif %}
+                {% if links.paper %}
+                  <a href="{{ links.paper }}" class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100 border border-slate-600 hover:border-emerald-400">
+                    Paper / Doc
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+    {% else %}
+      {# กรณีไม่มี cover ให้แสดงหัวธรรมดา #}
+      <section class="mb-8 space-y-3">
+        {% if projectType or status %}
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            {% if projectType %}
+              <span class="inline-flex items-center rounded-full bg-sky-500/10 px-3 py-1 text-sky-300 border border-sky-500/30">
+                {{ projectType | capitalize }}
+              </span>
+            {% endif %}
+            {% if status %}
+              <span class="inline-flex items-center rounded-full bg-emerald-500/10 px-3 py-1 text-emerald-300 border border-emerald-500/30">
+                สถานะ: {{ status }}
+              </span>
+            {% endif %}
+          </div>
+        {% endif %}
+        <h1 class="text-2xl md:text-3xl font-semibold tracking-tight">
+          {{ title or 'Untitled project' }}
+        </h1>
+        {% if summary %}
+          <p class="text-sm text-slate-300 leading-relaxed">
+            {{ summary }}
+          </p>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    {# เนื้อหา Markdown ของแต่ละหน้า #}
+    <article class="prose prose-invert max-w-none prose-sm md:prose-base prose-headings:text-slate-50 prose-a:text-sky-300 prose-a:no-underline hover:prose-a:underline prose-strong:text-slate-50 prose-code:text-sky-200 prose-pre:bg-slate-900">
+      {{ content | safe }}
+    </article>
+
+    {% if page.url != "/" %}
+      <div class="mt-10">
+        {% if projectType == "note" %}
+          <a href="/notes/" class="inline-flex items-center text-sm text-sky-300 hover:text-sky-200">
+            ← กลับไปหน้า Notes
+          </a>
+        {% elif page.url != "/projects/" and page.url != "/notes/" and page.url != "/about/" %}
+          <a href="/projects/" class="inline-flex items-center text-sm text-sky-300 hover:text-sky-200">
+            ← กลับไปหน้า Projects
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </main>
+
+  <footer class="mt-12 border-t border-slate-800 bg-slate-950/90">
+    <div class="max-w-5xl mx-auto px-4 py-6 text-xs text-slate-500 flex flex-wrap items-center justify-between gap-2">
+      <span>© 2026 ห้องทดลองเล็กๆ</span>
+      <span>Built with Eleventy</span>
+    </div>
+  </footer>
+</body>
+</html>
