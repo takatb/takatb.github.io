@@ -3,11 +3,65 @@ layout: layout.njk
 title: Projects
 ---
 
-<h2>ผลงานทั้งหมด</h2>
-<ul>
+<section class="page-intro">
+  <p class="eyebrow">Projects</p>
+  <h2>ผลงานทั้งหมด</h2>
+</section>
+
+<div class="sort-bar" aria-label="Project sorting">
+  <span>เรียงลำดับ</span>
+  <button type="button" class="sort-button is-active" data-sort="new">ใหม่ไปเก่า</button>
+  <button type="button" class="sort-button" data-sort="old">เก่าไปใหม่</button>
+  <button type="button" class="sort-button" data-sort="title">ตามตัวอักษร</button>
+</div>
+
+<ul class="item-list sortable-list" data-sortable-projects>
   {% for item in collections.projects | reverse %}
-    <li>
-      <a href="{{ item.url }}">{{ item.data.title }}</a> — {{ item.data.summary }}
+    <li
+      data-title="{{ item.data.title | lower }}"
+      data-date="{{ item.date.toISOString() }}"
+    >
+      <a href="{{ item.url }}">{{ item.data.title }}</a><br>
+      <small>{{ item.date.toISOString().slice(0,10) }}</small><br>
+      <span>{{ item.data.summary }}</span>
     </li>
   {% endfor %}
 </ul>
+
+<script>
+  (function() {
+    var list = document.querySelector('[data-sortable-projects]');
+    if (!list) return;
+
+    var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-sort]'));
+    var items = Array.prototype.slice.call(list.querySelectorAll('li'));
+
+    function sortItems(mode) {
+      var sorted = items.slice().sort(function(a, b) {
+        if (mode === 'old') {
+          return new Date(a.dataset.date) - new Date(b.dataset.date);
+        }
+
+        if (mode === 'title') {
+          return a.dataset.title.localeCompare(b.dataset.title, 'th');
+        }
+
+        return new Date(b.dataset.date) - new Date(a.dataset.date);
+      });
+
+      sorted.forEach(function(item) {
+        list.appendChild(item);
+      });
+    }
+
+    buttons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        buttons.forEach(function(item) {
+          item.classList.remove('is-active');
+        });
+        button.classList.add('is-active');
+        sortItems(button.dataset.sort);
+      });
+    });
+  })();
+</script>

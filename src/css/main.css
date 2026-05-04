@@ -153,6 +153,35 @@ li {
   padding: 18px;
 }
 
+.sort-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.sort-button {
+  min-height: 32px;
+  padding: 6px 12px;
+  color: var(--accent-strong);
+  font: inherit;
+  font-weight: 700;
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.sort-button:hover,
+.sort-button.is-active {
+  color: #ffffff;
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
 .meta-row {
   display: grid;
   grid-template-columns: 32px minmax(0, 1fr);
