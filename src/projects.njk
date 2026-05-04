@@ -15,11 +15,29 @@ title: Projects
   <button type="button" class="sort-button" data-sort="title">ตามตัวอักษร</button>
 </div>
 
+{% set projectTags = [] %}
+{% for item in collections.projects %}
+  {% for tag in item.data.tags %}
+    {% if tag != "projects" and projectTags.indexOf(tag) == -1 %}
+      {% set projectTags = projectTags.concat([tag]) %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+
+<div class="filter-bar" aria-label="Project tags">
+  <span>Tag</span>
+  <button type="button" class="filter-button is-active" data-filter="all">ทั้งหมด</button>
+  {% for tag in projectTags | sort %}
+    <button type="button" class="filter-button" data-filter="{{ tag | lower }}">{{ tag }}</button>
+  {% endfor %}
+</div>
+
 <ul class="item-list sortable-list" data-sortable-projects>
   {% for item in collections.projects | reverse %}
     <li
       data-title="{{ item.data.title | lower }}"
       data-date="{{ item.date.toISOString() }}"
+      data-tags="{{ item.data.tags | join(' ') | lower }}"
     >
       <a href="{{ item.url }}">{{ item.data.title }}</a><br>
       <small>{{ item.date.toISOString().slice(0,10) }}</small><br>
@@ -28,39 +46,65 @@ title: Projects
   {% endfor %}
 </ul>
 
+<p class="empty-state" data-empty-projects hidden>ไม่พบ project ใน tag นี้</p>
+
 <script>
   (function() {
     var list = document.querySelector('[data-sortable-projects]');
     if (!list) return;
 
-    var buttons = Array.prototype.slice.call(document.querySelectorAll('[data-sort]'));
+    var sortButtons = Array.prototype.slice.call(document.querySelectorAll('[data-sort]'));
+    var filterButtons = Array.prototype.slice.call(document.querySelectorAll('[data-filter]'));
     var items = Array.prototype.slice.call(list.querySelectorAll('li'));
+    var emptyState = document.querySelector('[data-empty-projects]');
+    var currentSort = 'new';
+    var currentFilter = 'all';
 
-    function sortItems(mode) {
+    function updateProjects() {
       var sorted = items.slice().sort(function(a, b) {
-        if (mode === 'old') {
+        if (currentSort === 'old') {
           return new Date(a.dataset.date) - new Date(b.dataset.date);
         }
 
-        if (mode === 'title') {
+        if (currentSort === 'title') {
           return a.dataset.title.localeCompare(b.dataset.title, 'th');
         }
 
         return new Date(b.dataset.date) - new Date(a.dataset.date);
       });
 
+      var visibleCount = 0;
       sorted.forEach(function(item) {
+        var isVisible = currentFilter === 'all' || item.dataset.tags.split(' ').indexOf(currentFilter) !== -1;
+        item.hidden = !isVisible;
+        if (isVisible) visibleCount += 1;
         list.appendChild(item);
       });
+
+      if (emptyState) {
+        emptyState.hidden = visibleCount > 0;
+      }
     }
 
-    buttons.forEach(function(button) {
+    sortButtons.forEach(function(button) {
       button.addEventListener('click', function() {
-        buttons.forEach(function(item) {
+        sortButtons.forEach(function(item) {
           item.classList.remove('is-active');
         });
         button.classList.add('is-active');
-        sortItems(button.dataset.sort);
+        currentSort = button.dataset.sort;
+        updateProjects();
+      });
+    });
+
+    filterButtons.forEach(function(button) {
+      button.addEventListener('click', function() {
+        filterButtons.forEach(function(item) {
+          item.classList.remove('is-active');
+        });
+        button.classList.add('is-active');
+        currentFilter = button.dataset.filter;
+        updateProjects();
       });
     });
   })();
