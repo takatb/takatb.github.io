@@ -73,13 +73,16 @@
 
           {# tools #}
           {% if tools %}
-            <div class="space-y-1">
-              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                Tools / Tech
-              </p>
-              <div class="flex flex-wrap gap-2 text-xs">
+            <div class="meta-row">
+              <div class="meta-icon" aria-label="Tools / Tech">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 20h9" />
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+              </div>
+              <div class="meta-capsules" aria-label="Tools / Tech">
                 {% for tool in tools %}
-                  <span class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100 border border-slate-700">
+                  <span class="capsule capsule-{{ loop.index0 % 5 }}">
                     {{ tool }}
                   </span>
                 {% endfor %}
@@ -88,24 +91,28 @@
           {% endif %}
 
           {# links #}
-          {% if links %}
-            <div class="space-y-2">
-              <p class="text-xs font-medium uppercase tracking-wide text-slate-400">
-                Links
-              </p>
-              <div class="flex flex-wrap gap-2 text-xs">
+          {% if links and (links.demo or links.repo or links.paper) %}
+            <div class="meta-row">
+              <div class="meta-icon" aria-label="Links">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 16v-4" />
+                  <path d="M12 8h.01" />
+                </svg>
+              </div>
+              <div class="meta-capsules" aria-label="Links">
                 {% if links.demo %}
-                  <a href="{{ links.demo }}" class="inline-flex items-center rounded-full bg-sky-500 px-3 py-1 text-slate-950 font-medium hover:bg-sky-400">
+                  <a href="{{ links.demo }}" class="capsule capsule-0">
                     Demo
                   </a>
                 {% endif %}
                 {% if links.repo %}
-                  <a href="{{ links.repo }}" class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100 border border-slate-600 hover:border-sky-400">
+                  <a href="{{ links.repo }}" class="capsule capsule-1">
                     Source
                   </a>
                 {% endif %}
                 {% if links.paper %}
-                  <a href="{{ links.paper }}" class="inline-flex items-center rounded-full bg-slate-800 px-3 py-1 text-slate-100 border border-slate-600 hover:border-emerald-400">
+                  <a href="{{ links.paper }}" class="capsule capsule-2">
                     Paper / Doc
                   </a>
                 {% endif %}
