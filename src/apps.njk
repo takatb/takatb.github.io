@@ -1,0 +1,55 @@
+---
+layout: layout.njk
+title: Apps
+permalink: /apps/
+apps:
+  - title: Mass-Spring Simulation
+    url: /apps/mass_spring_simulation.html
+    type: Simulation
+    summary: จำลองระบบมวล-สปริงแนวตั้งสำหรับทดลองพารามิเตอร์และดูการตอบสนองของระบบ
+  - title: Pendulum Simulation
+    url: /apps/pendulum_simulation.html
+    type: Simulation
+    summary: จำลองการแกว่งของลูกตุ้มอย่างง่าย เพื่อสำรวจความสัมพันธ์ของความยาว ความเร็ว และพลังงาน
+  - title: QR Code Generator
+    url: /apps/qr_gen.html
+    type: Utility
+    summary: สร้าง QR Code จากข้อความหรือ URL และดาวน์โหลดเป็นไฟล์ภาพได้จาก HTML app ไฟล์เดียว
+externalApps:
+  - title: Vite + React + TypeScript Test App
+    url: https://takatb.github.io/vite_react_ts_testAPP/
+    summary: โปรเจกต์ทดลอง React ที่เผยแพร่แยกไว้บน GitHub Pages
+  - title: Self-hosted Server
+    url: http://tactics.thddns.net:3930
+    summary: ลิงก์ไปยัง server ส่วนตัวสำหรับงานทดลองที่รันแยกจากเว็บ static
+---
+
+<section class="page-intro">
+  <p class="eyebrow">Apps</p>
+  <h2>Interactive apps</h2>
+  <p>รวมเครื่องมือและ simulation ที่เป็น HTML app พร้อมสคริปต์ในตัว หน้าเหล่านี้ถูกเผยแพร่แบบ static โดยตรง ส่วนหน้านี้สร้างด้วย Eleventy เพื่อให้จัดรายการและเชื่อมกับเว็บหลักได้เหมือนหน้า Notes</p>
+</section>
+
+<ul class="item-list">
+  {% for app in apps %}
+    <li>
+      <a href="{{ app.url }}">{{ app.title }}</a><br>
+      <small>{{ app.type }}</small><br>
+      <span>{{ app.summary }}</span>
+    </li>
+  {% endfor %}
+</ul>
+
+<section class="page-intro">
+  <p class="eyebrow">External</p>
+  <h2>External projects</h2>
+</section>
+
+<ul class="item-list">
+  {% for app in externalApps %}
+    <li>
+      <a href="{{ app.url }}" target="_blank" rel="noopener noreferrer">{{ app.title }}</a><br>
+      <span>{{ app.summary }}</span>
+    </li>
+  {% endfor %}
+</ul>
