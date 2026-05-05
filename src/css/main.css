@@ -1,4 +1,16 @@
 :root {
+  color-scheme: dark;
+  --bg: #111814;
+  --surface: #17211d;
+  --surface-strong: #1d2a25;
+  --text: #edf3ed;
+  --muted: #a8b4aa;
+  --line: #304139;
+  --accent: #7bd1c5;
+  --accent-strong: #9ee5da;
+}
+
+[data-theme="light"] {
   color-scheme: light;
   --bg: #f7f3ec;
   --surface: #fffaf2;
@@ -83,7 +95,39 @@ footer {
 nav {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 14px;
+}
+
+.theme-toggle {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  color: var(--accent-strong);
+  background: var(--surface-strong);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  background: rgba(123, 209, 197, 0.14);
+}
+
+.theme-icon {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+[data-theme="dark"] .theme-icon-moon,
+[data-theme="light"] .theme-icon-sun {
+  display: none;
 }
 
 main {
@@ -330,8 +374,8 @@ li {
 }
 
 .about-panel-featured {
-  background: #edf7f3;
-  border-color: #b7d8cd;
+  background: rgba(123, 209, 197, 0.12);
+  border-color: rgba(123, 209, 197, 0.32);
 }
 
 .about-panel h3,

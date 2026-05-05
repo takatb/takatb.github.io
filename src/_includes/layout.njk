@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="th">
+<html lang="th" data-theme="dark">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,6 +12,17 @@
     <meta name="description" content="{{ summary }}">
   {% endif %}
   <meta name="color-scheme" content="light dark">
+
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('site-theme');
+        if (theme === 'light' || theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      } catch (error) {}
+    })();
+  </script>
 
   {# ถ้ามีไฟล์ CSS ภายนอก (ปัจจุบันหรือของ Tailwind ที่ build แล้ว) ให้ใส่ตรงนี้ #}
   <link rel="stylesheet" href="/css/main.css?v=20260504-noto">
@@ -28,6 +39,22 @@
         <a href="/apps/" class="hover:text-sky-300">Apps</a>
         <a href="/notes/" class="hover:text-sky-300">Notes</a>
         <a href="/about/" class="hover:text-sky-300">About</a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="Switch color theme">
+          <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2" />
+            <path d="M12 20v2" />
+            <path d="m4.93 4.93 1.41 1.41" />
+            <path d="m17.66 17.66 1.41 1.41" />
+            <path d="M2 12h2" />
+            <path d="M20 12h2" />
+            <path d="m6.34 17.66-1.41 1.41" />
+            <path d="m19.07 4.93-1.41 1.41" />
+          </svg>
+          <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.6 6.6 0 0 0 21 12.8Z" />
+          </svg>
+        </button>
       </nav>
     </div>
   </header>
@@ -175,5 +202,25 @@
       <span>Built with Eleventy</span>
     </div>
   </footer>
+  <script>
+    (function() {
+      var button = document.querySelector('[data-theme-toggle]');
+      if (!button) return;
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
+        try {
+          localStorage.setItem('site-theme', theme);
+        } catch (error) {}
+      }
+
+      setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+      button.addEventListener('click', function() {
+        var current = document.documentElement.getAttribute('data-theme') || 'dark';
+        setTheme(current === 'dark' ? 'light' : 'dark');
+      });
+    })();
+  </script>
 </body>
 </html>
