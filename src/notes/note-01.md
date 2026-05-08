@@ -1,30 +1,30 @@
 ---
 layout: layout.njk
-title: "Note: ทดลองจูน PID สำหรับ test rig"
-date: 2026-05-02T22:30:00+07:00
-permalink: /notes/pid-tuning-test-rig/
+title: "คำสั่งเพิ่ม project"
+date: 2026-05-09T22:30:00+07:00
+permalink: /notes/001-add project/
 
 tags:
   - note
-  - control
-  - experiment
+  - Github
 
 summary: >-
-  บันทึกสั้นเกี่ยวกับการจูนค่า PID ให้กับ test rig
-  พร้อมข้อสังเกตพฤติกรรม overshoot และ settling time
+  คำสั่งในการเพิ่มเอกสาร บันทึกในระบบนี้ และ commit ไปยัง github
+  สำหรับ copy paste อย่างรวดเร็ว
 
 # projectType: normal | play | experiment | document | tool | note
 projectType: note
-status: finished
+status: 
 
 featured: false
 order: 60
 
-cover: /images/test-rig.png
+cover: 
 
 tools:
-  - Python
-  - MATLAB
+  - CMD
+  - Github
+  - PowerShell
 
 links:
   demo:
