@@ -20,7 +20,7 @@ status: finished
 featured: true
 order: 8
 
-cover: ../images/005-shell-img00.png
+cover: /images/005-shell-img00.png
 
 tools:
   - Eleventy
@@ -61,7 +61,7 @@ links:
 - **EXECUTE (สั่งงานระบบ):** ค้นหาโปรแกรมที่เกี่ยวข้องและส่งคำสั่งไปยัง Kernel เพื่อเริ่มต้นกระบวนการทำงาน
 - **WAIT/DISPLAY (แสดงผลลัพธ์):** เชลล์จะรอจนกว่าการทำงานของระบบจะเสร็จสิ้น จากนั้นจึงนำผลลัพธ์มาแสดงผลบนหน้าจอ และเตรียมพร้อมรับคำสั่งถัดไป
 
-![005-shell-img01.png](/images/005-shell-img01.png)
+![005-shell-img01.png](/images/005-shell-img02.png)
 
 **ประโยชน์และความสำคัญในงานวิศวกรรมและการพัฒนาระบบ**
 
