@@ -3,7 +3,7 @@
   --bg: #111814;
   --surface: #17211d;
   --surface-strong: #1d2a25;
-  --text: #edf3ed;
+  --text: #d7e0d7;
   --muted: #a8b4aa;
   --line: #304139;
   --accent: #7bd1c5;
@@ -12,9 +12,9 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f7f3ec;
-  --surface: #fffaf2;
-  --surface-strong: #ffffff;
+  --bg: #e0dbd0;
+  --surface: #e1dbd1;
+  --surface-strong: #fff7f7;
   --text: #202124;
   --muted: #6b655c;
   --line: #ded6c8;
@@ -542,7 +542,7 @@ pre,
 kbd,
 samp {
   font-family: "Cascadia Mono", "Consolas", "Liberation Mono", "Courier New", monospace;
-  font-size: 0.8em;
+  font-size: 1.0em;
 }
 
 pre {

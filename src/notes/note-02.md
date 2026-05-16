@@ -1,17 +1,15 @@
 ---
 layout: layout.njk
-title: "Note: ทดลองจูน PID สำหรับ test rig"
-date: 2026-05-02T22:30:00+07:00
-permalink: /notes/pid-tuning-test-rig2/
+title: "ทำความเข้าใจเกี่ยวกับ .json"
+date: 2026-05-09T22:30:00+07:00
+permalink: /notes/002-json/
 
 tags:
   - note
-  - control
-  - experiment
+  - json
 
 summary: >-
-  บันทึกสั้นเกี่ยวกับการจูนค่า PID ให้กับ test rig
-  พร้อมข้อสังเกตพฤติกรรม overshoot และ settling time
+  JSON (JavaScript Object Notation) 
 
 projectType: note
 status: finished
@@ -19,20 +17,30 @@ status: finished
 featured: false
 order: 60
 
-cover: /images/test-rig.png
+cover: /images/n002-json-cover.png
 
 tools:
-  - Python
-  - MATLAB
-
+  - json
 links:
   demo:
   repo:
   paper:
 ---
 
-นี่คือรายละเอียดของโปรเจกต์ Vibration Teaching Demo
+JSON (JavaScript Object Notation) เป็นมาตรฐานรูปแบบข้อมูลสำหรับแลกเปลี่ยนข้อมูลระหว่างระบบที่ได้รับความนิยมสูงสุดในปัจจุบัน โดยมีลักษณะเป็นข้อความธรรมดา (plain text) ที่ทั้งมนุษย์และโปรแกรมคอมพิวเตอร์สามารถอ่านและเข้าใจได้ รูปแบบนี้ถูกออกแบบมาให้เรียบง่าย กระชับ และมีน้ำหนักเบา (lightweight) เหมาะสำหรับการสื่อสารข้อมูลระหว่างเซิร์ฟเวอร์และไคลเอนต์ โดยเฉพาะในงานพัฒนา APIs, AJAX, และ REST
+
+## โครงสร้างและรูปแบบ
+
+JSON เก็บข้อมูลในรูปแบบคู่ของ key-value โดยใช้เครื่องหมายปีกกา `{}` ครอบ ชื่อฟิลด์ (key) จะต้องครอบด้วยเครื่องหมาย `"` (double quote) ตามด้วยเครื่องหมาย `:` (colon) และค่าข้อมูล (value) ตัวอย่างเช่น `{"name": "Sonny"}` โดย name เป็น key และ "Sonny" เป็น value JSON สามารถเก็บข้อมูลได้หลายชนิด ประกอบด้วย string, number, boolean, array (ใช้เครื่องหมาย `[]`), object (JSON object ซ้อนกัน), และ null
+
+## ข้อดีและประโยชน์
+
+JSON มีข้อดีหลายประการที่ทำให้ได้รับความนิยม ได้แก่ โครงสร้างไม่ซับซ้อนทำให้ประหยัดพื้นที่ในการเก็บข้อมูล สามารถนำไปใช้งานได้เร็ว โดยเฉพาะใน JavaScript ที่สามารถแปลงเป็น JavaScript Object ได้ทันทีผ่านคำสั่ง `JSON.parse()` นอกจากนี้ยังอ่านและแก้ไขได้ง่าย เป็นภาษากลางที่ช่วยให้โปรแกรมต่างๆ สามารถสื่อสารกันได้ และได้รับการรองรับจากหลายภาษาโปรแกรม เช่น Python, Java, Ruby
+
+## การใช้งาน
+
+JSON นิยมใช้ในหลายสถานการณ์ เช่น การแลกเปลี่ยนข้อมูลผ่าน WebSockets และ HTTP endpoints, การพัฒนาเว็บแอปพลิเคชันโดยเฉพาะ AJAX, การเขียนไฟล์คอนฟิกสำหรับโปรแกรม และการเก็บข้อมูลในฐานข้อมูล การใช้ JSON แทนการสร้างฟอร์แมตเอง ทำให้ทุกคนสามารถแปลงข้อมูลได้ง่ายตามมาตรฐานที่กำหนดไว้
 
 
 
-<img src="/images/test-rig.png" alt="ชุดทดลอง test rig" width="700" loading="lazy">
+<img src="/images/n002-json-img01.jpg">
