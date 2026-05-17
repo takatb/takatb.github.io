@@ -2,7 +2,7 @@
 layout: layout.njk
 title: ติดตั้ง Ubuntu บน WSL2
 date: 2026-03-17T00:00:00+07:00
-permalink: /projects/ubuntu on WSL2/
+permalink: /projects/ubuntuwsl2/
 
 tags:
   - ubuntu
@@ -20,7 +20,7 @@ status: finished
 featured: true
 order: 8
 
-cover: /images/005-shell-img00.jpg
+cover: /images/004-ubuntuwsl2-img00.png
 
 tools:
   - WSL2
